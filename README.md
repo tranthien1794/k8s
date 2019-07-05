@@ -2,11 +2,11 @@
 
 * Yêu cầu tối thiểu 3 node master, worker tùy theo resource
 
-Khai báo ENV trong vars.yaml
+* Khai báo ENV trong vars.yaml
 
 ## Khởi tạo môi trường 
-Chạy trên tất cả các node , cài đặt docker,kubernet, tắt swap, bật ipv4 forward 
-Chỉnh sửa trong *install_docker.sh*
+* Chạy trên tất cả các node , cài đặt docker,kubernet, tắt swap, bật ipv4 forward 
+* Chỉnh sửa trong *install_docker.sh*
 
 ```
 ansible-playbook ansible_preinstall.yaml --extra-vars "HOST="
