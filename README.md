@@ -41,3 +41,38 @@ ansible-playbook ansible_master_2.yaml --extra-vars "HOST="
 ```
 
 * Edit priority 89 trong keepalived trên các node master 
+
+#### Install ingress, dashboard
+
+* Traefik ingress
+
+```
+kubectl apply -f service/traefik.yaml
+kubectl apply -f service/kubernetes-dashboard.yaml
+```
+
+* Tạo secret registry 
+
+```
+kubectl --kubeconfig /etc/kubernetes/admin.conf create secret docker-registry registry --docker-server=IP:PORT --docker-username=USER --docker-password=PASS --namespace NAMESPACE
+```
+
+* Tạo configmap
+
+```
+kubectl create configmap NAME --from-file=FILE --namespace NAMESPACE
+```
+
+##### Autoscale service k8s
+
+```
+kubectl apply -f service/1.8+/
+kubectl autoscale deployment DEPLOYMENT_SERVICE --cpu-percent=5 --min=2 --max=10 -n NAMESPACE
+```
+
+###### Các command thông dụng
+
+```
+kubectl get pod
+kubectl get node
+```
