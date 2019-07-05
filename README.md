@@ -12,7 +12,7 @@
 ansible-playbook ansible_preinstall.yaml --extra-vars "HOST="
 ```
 
-### ETCD Cluster
+## ETCD Cluster
 
 * Tạo TLS cho etcd
 
@@ -26,7 +26,7 @@ ansible-playbook ansible_etcd_1.yaml
 ansible-playbook ansible_etcd_2.yaml --extra-vars "HOST="
 ```
 
-### Kubernetes
+## Kubernetes
 
 * Khởi tạo node đầu tiên 
 
@@ -42,7 +42,7 @@ ansible-playbook ansible_master_2.yaml --extra-vars "HOST="
 
 * Edit priority 89 trong keepalived trên các node master 
 
-#### Install ingress, dashboard
+### Install ingress, dashboard
 
 * Traefik ingress
 
@@ -63,14 +63,14 @@ kubectl --kubeconfig /etc/kubernetes/admin.conf create secret docker-registry re
 kubectl create configmap NAME --from-file=FILE --namespace NAMESPACE
 ```
 
-##### Autoscale service k8s
+### Autoscale service k8s
 
 ```
 kubectl apply -f service/1.8+/
 kubectl autoscale deployment DEPLOYMENT_SERVICE --cpu-percent=5 --min=2 --max=10 -n NAMESPACE
 ```
 
-###### Các command thông dụng
+### Các command thông dụng
 
 ```
 kubectl get pod
