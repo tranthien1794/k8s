@@ -1,0 +1,55 @@
+---
+- name: Master
+  hosts: {{ HOST }}
+  gather_facts: no
+  sudo: yes
+  tasks:
+    - name: bash master.sh {{ HOST0 }} {{ HOST1 }} {{ HOST2 }} {{ VIP }} {{ VIP_PORT }}
+    - name: Install haproxy
+        yum:
+          name: haproxy
+          state: latest
+    - name: Install keepalived
+        yum:
+          name: keepalived
+          state: latest
+    - name: Install wget
+        yum:
+          name: wget
+          state: latest
+    - name: copy haproxy config
+        copy:
+          src: ./config/haproxy.cfg 
+          dest: /etc/haproxy/haproxy.cfg
+    - name: copy keepalived config
+        copy:
+          src: ./config/keepalived.conf 
+          dest: /etc/keepalived/keepalived.conf
+    - name: systemctl start haproxy
+        systemd:
+          name: haproxy
+          state: started
+          enabled: yes
+          masked: no
+    - name: systemctl start keepalived
+        systemd:
+          name: keepalived
+          state: started
+          enabled: yes
+          masked: no
+    - name: copy config kubernetes
+        copy:
+          src: ./config/config.yaml
+          dest: /tmp/config.yaml
+    - name: init kubernetes
+        shell: kubeadm init --config=/tmp/config.yaml
+        register: kubernetes.init
+    - debug: var=kubernetes.init
+    - name: install waeve
+        shell: kubectl --kubeconfig /etc/kubernetes/admin.conf apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl --kubeconfig /etc/kubernetes/admin.conf version | base64 | tr -d '\n')"=
+    - name: taint master node
+        shell: kubectl taint nodes --all node-role.kubernetes.io/master-
+    - name: get pki kubernetes
+        fetch: 
+          src: /etc/kubernetes/pki
+          dest: /tmp/kubernetes/pki

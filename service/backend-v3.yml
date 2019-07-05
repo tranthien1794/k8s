@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: services-vieon-backend-v3
+  namespace: ott-production
+spec:
+  selector:
+    matchLabels:
+      run: services-vieon-backend-v3
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        run: services-vieon-backend-v3
+    spec:
+      containers:
+      - name: services-vieon-backend-v3
+        image: hub.dtube.vn:5000/testing-services-vieon-backend-v3:159
+        resources:
+          limits:
+            cpu: "2"
+            memory: "2Gi"
+          requests:
+            cpu: "2"
+            memory: "2Gi"
+        ports:
+        - containerPort: 1993
+        volumeMounts:
+        - name: "production-backend-v3"
+          mountPath: "/home/services-vieon-backend-v3/config/common.config"
+          subPath: "common.config"
+      imagePullSecrets:
+      - name: registry
+      restartPolicy: Always
+      volumes:
+        - name: "production-backend-v3"
+          configMap:
+            name: "production-backend-v3"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: ott-production
+  name: production-backend-v3
+  labels:
+    run: production-backend-v3
+spec:
+  ports:
+  - port: 1993
+    protocol: TCP
+  selector:
+    run: services-vieon-backend-v3
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: production-backend-v3
+  namespace: ott-production
+  annotations:
+    kubernetes.io/ingress.class: traefik
+spec:
+  rules:
+  - host: api.vieon.vn
+    http:
+      paths:
+      - path: /backend/cm/v3/
+        backend:
+          serviceName: production-backend-v3
+          servicePort: 1993
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: production-backend-v3-nginx
+  namespace: ott-production
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+  - host: api.vieon.vn
+    http:
+      paths:
+      - path: /backend/cm/v3/
+        backend:
+          serviceName: production-backend-v3
+          servicePort: 1993
+

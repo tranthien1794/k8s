@@ -1,0 +1,22 @@
+apiVersion: kubeadm.k8s.io/v1beta1
+kind: ClusterConfiguration
+kubernetesVersion: stable
+apiServer:
+  certSANs:
+  - "${VIP}"
+  extraArgs:
+   advertise-address: "${VIP}"
+controlPlaneEndpoint: "${VIP}:${VIP_PORT}"
+etcd:
+  external:
+    endpoints:
+    - https://${HOST0}:2379
+    - https://${HOST1}:2379
+    - https://${HOST2}:2379
+    caFile: /etc/etcd/ca.pem
+    certFile: /etc/etcd/kubernetes.pem
+    keyFile: /etc/etcd/kubernetes-key.pem
+networking:
+  podSubnet: 10.30.0.0/24
+apiServerExtraArgs:
+  apiserver-count: "3"

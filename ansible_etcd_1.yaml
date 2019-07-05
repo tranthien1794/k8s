@@ -1,0 +1,26 @@
+- name: ETCD
+  hosts: 127.0.0.1
+  vars_files:
+   - vars.yaml
+  connection: local
+  gather_facts: no
+  sudo: yes
+  tasks:
+    - name: Download cfssl_linux-amd64
+        get_url:
+          url: https://pkg.cfssl.org/R1.2/cfssl_linux-amd64
+          dest: ./etcd/cfssl_linux-amd64
+          mode: 755
+    - name: Download cfssljson_linux-amd64
+        get_url: 
+          url: https://pkg.cfssl.org/R1.2/cfssljson_linux-amd64
+          dest: ./etcd/cfssljson_linux-amd64
+          mode: 755
+    - name: Download ETCD "{{ ETCD_VERSION }}"
+        get_url:
+          url: https://github.com/coreos/etcd/releases/download/{{ ETCD_VERSION }}/etcd-{{ ETCD_VERSION }}-linux-amd64.tar.gz
+          dest: ./etcd/etcd-{{ ETCD_VERSION }}-linux-amd64.tar.gz
+    - name: Generate etcd config
+        shell: bash etcd_cluster.sh {{ HOST0 }} {{ HOST1 }} {{ HOST2 }} {{ VIP }} {{ VIP_PORT }}
+    - name: Untar etcd
+        shell: tar -xvf ./etcd/etcd-{{ ETCD_VERSION }}-linux-amd64.tar.gz --directory=./etcd

@@ -1,0 +1,48 @@
+---
+- name: Master
+  hosts: {{ HOST }}
+  gather_facts: no
+  sudo: yes
+  vars_files:
+   - vars.yaml
+  tasks: 
+    - name: Install haproxy
+        yum:
+          name: haproxy
+          state: latest
+    - name: Install keepalived
+        yum:
+          name: keepalived
+          state: latest
+    - name: Install wget
+        yum:
+          name: wget
+          state: latest
+    - name: copy haproxy config
+        copy:
+          src: ./config/haproxy.cfg 
+          dest: /etc/haproxy/haproxy.cfg
+    - name: copy keepalived config
+        copy:
+          src: ./config/keepalived_backup.conf 
+          dest: /etc/keepalived/keepalived.conf
+    - name: systemctl start haproxy
+        systemd:
+          name: haproxy
+          state: started
+          enabled: yes
+          masked: no
+    - name: systemctl start keepalived
+        systemd:
+          name: keepalived
+          state: started
+          enabled: yes
+          masked: no
+  	- name: Copy PKI
+    		synchronize:
+  		    src: /tmp/kubernetes/pki
+  		    dest: /etc/kubernetes/pki
+  		    rsync_opts:
+  		      - "--exclude=apiserver*"
+		- name: Join Node
+  			shell: kubeadm join {{ VIP }}:{{ VIP_PORT }} --token {{ TOKEN }} --discovery-token-ca-cert-hash {{ TOKEN-CA }} --experimental-control-plane

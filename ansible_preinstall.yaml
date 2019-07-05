@@ -1,0 +1,13 @@
+---
+- name: Preinstall
+  hosts: {{ HOST }}
+  remote_user: {{ USER }}
+  gather_facts: no
+  sudo: yes
+  tasks:
+    - name: Docker, kubelet, disable swap, enable forward ip.
+      copy:
+        src: install_docker.sh
+        dest: /tmp/install_docker.sh
+      shell:
+        command: bash /tmp/install_docker.sh

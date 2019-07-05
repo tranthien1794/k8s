@@ -1,0 +1,35 @@
+- name: ETCD_CLUSTER
+  hosts: {{ HOST }}
+  vars_files:
+   - vars.yaml
+  gather_facts: no
+  sudo: yes
+  tasks:
+    - file:
+        path: /etc/etcd
+        state: directory
+    - file:
+        path: /var/lib/etcd
+        state: directory
+    - copy:
+        src: ./etcd/etcd-{{ ETCD_VERSION }}-linux-amd64
+        dest: /etc/etcd
+    - copy:
+        src: ./etcd/ca.pem
+        dest: /etc/etcd/
+    - copy:
+        src: ./etcd/kubernetes.pem
+        dest: /etc/etcd/
+    - copy:
+        src: ./etcd/kubernetes-key.pem
+        dest: /etc/etcd/
+    - copy:
+        src: ./etcd/etcd-{{ HOST }}.service
+        dest: /etc/systemd/system/etcd.service
+    - name: Start and enblale etcd
+        systemd:
+          name: etcd
+          state: started
+          enabled: yes
+          masked: no
+          daemon_reload: yes
