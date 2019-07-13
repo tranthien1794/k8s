@@ -1,5 +1,5 @@
 # Install Docker, kubelet, disable swap, enable forward ip.
-sudo apt update
+sudo yum update
 sudo timedatectl set-timezone Asia/Ho_Chi_Minh
 sudo yum install -y yum-utils \
   device-mapper-persistent-data \
